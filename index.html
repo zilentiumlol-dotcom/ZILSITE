@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ZilFerd</title>
 <meta name="theme-color" content="#ffffff">
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
 
@@ -50,6 +50,44 @@
 </svg>
 
 <!-- ===== Центр: череп + вращающиеся кресты ===== -->
+<!-- ============================================================
+     Музыкальная плашка (SoundCloud)
+     ============================================================ -->
+<aside class="music">
+  <p class="music__caption">А пока можете послушать этот шедевр</p>
+
+  <div class="player">
+    <button class="player__btn" id="playerBtn" type="button" aria-label="Воспроизвести">
+      <svg class="player__icon player__icon--play" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 5 L19 12 L8 19 Z"/>
+      </svg>
+      <svg class="player__icon player__icon--stop" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="7" y="7" width="10" height="10"/>
+      </svg>
+    </button>
+
+    <div class="player__body">
+      <div class="player__bar"><span class="player__fill" id="playerFill"></span></div>
+      <p class="player__time"><span id="playerCur">0:00</span> / <span id="playerDur">--:--</span></p>
+    </div>
+  </div>
+
+  <p class="music__credit">
+    <a href="https://soundcloud.com/user-253695668" target="_blank" rel="noopener">Yukth</a>
+    ·
+    <a href="https://soundcloud.com/user-253695668/lobotomy-corporation-ost-emergency2" target="_blank" rel="noopener">Lobotomy Corporation |OST| Emergency2</a>
+  </p>
+
+  <!-- сам виджет SoundCloud: вынесен за экран, работает как источник звука -->
+  <div class="player__source" aria-hidden="true">
+    <iframe id="scPlayer"
+            title="SoundCloud"
+            scrolling="no"
+            allow="autoplay; encrypted-media"
+            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A508272441&amp;color=%230f0605&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=false&amp;show_reposts=false&amp;show_teaser=false"></iframe>
+  </div>
+</aside>
+
 <main class="stage">
   <div class="ring" aria-hidden="true" focusable="false">
     <span class="slot" style="--a:0deg">
@@ -107,6 +145,65 @@
   <h2 class="note__title">Здесь пока ничего нету</h2>
   <p class="note__text">Я ещё ничего тут не сделал, но спустя время думаю обязательно что ни будь сделаю</p>
 </aside>
+
+<script src="https://w.soundcloud.com/player/api.js"></script>
+<script>
+(function () {
+  var frame = document.getElementById('scPlayer');
+  var btn   = document.getElementById('playerBtn');
+  var fill  = document.getElementById('playerFill');
+  var cur   = document.getElementById('playerCur');
+  var dur   = document.getElementById('playerDur');
+
+  if (!frame || !btn) { return; }
+  if (typeof SC === 'undefined') {
+    btn.disabled = true;
+    btn.setAttribute('aria-label', 'Плеер недоступен');
+    return;
+  }
+
+  var widget  = SC.Widget(frame);
+  var total   = 0;
+  var playing = false;
+
+  function time(ms) {
+    var s = Math.max(0, Math.floor(ms / 1000));
+    return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+  }
+
+  function paint(pos) {
+    cur.textContent = time(pos);
+    fill.style.width = total > 0 ? (Math.min(pos / total, 1) * 100) + '%' : '0%';
+  }
+
+  function setPlaying(state) {
+    playing = state;
+    btn.classList.toggle('is-playing', state);
+    btn.setAttribute('aria-label', state ? 'Остановить' : 'Воспроизвести');
+  }
+
+  function readDuration() {
+    widget.getDuration(function (ms) {
+      total = ms || 0;
+      if (total > 0) { dur.textContent = time(total); }
+    });
+  }
+
+  widget.bind(SC.Widget.Events.READY, readDuration);
+  widget.bind(SC.Widget.Events.PLAY, function () { setPlaying(true); });
+  widget.bind(SC.Widget.Events.PAUSE, function () { setPlaying(false); });
+  widget.bind(SC.Widget.Events.FINISH, function () { setPlaying(false); paint(0); });
+
+  widget.bind(SC.Widget.Events.PLAY_PROGRESS, function (e) {
+    if (!total) { readDuration(); }
+    paint(e.currentPosition);
+  });
+
+  btn.addEventListener('click', function () {
+    if (playing) { widget.pause(); } else { widget.play(); }
+  });
+})();
+</script>
 
 </body>
 </html>

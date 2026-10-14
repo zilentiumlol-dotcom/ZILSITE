@@ -1,8 +1,10 @@
 /* ============================================================
    ZilFerd — чёрно-белая графика
    1. Листья по бокам
-   2. Череп (skull.png) по центру
-   3. Кресты, вращающиеся вокруг черепа
+   2. Музыкальная плашка сверху
+   3. Череп (skull.png) по центру
+   4. Сноска внизу
+   5. Кресты, вращающиеся вокруг черепа
    ============================================================ */
 
 :root {
@@ -10,7 +12,7 @@
   --paper: #ffffff;   /* белый  */
 
   /* диаметр орбиты крестов = размер сцены */
-  --stage: clamp(280px, 48vmin, 500px);
+  --stage: clamp(260px, 40vmin, 440px);
 
   /* размер одного креста */
   --cw: clamp(13px, 2.8vmin, 26px);
@@ -69,7 +71,106 @@ body {
 }
 .leaf--solid { fill: var(--ink); }
 
-/* ---------- 2. Череп ---------- */
+/* ---------- 2. Музыкальная плашка ---------- */
+
+.music {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 88vw);
+  padding: clamp(16px, 2.4vh, 24px) clamp(18px, 3vw, 28px);
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  text-align: center;
+}
+
+.music__caption {
+  margin: 0 0 clamp(8px, 1.4vh, 12px);
+  font-size: clamp(13px, 1.8vmin, 16px);
+  line-height: 1.5;
+}
+
+/* мини-плеер: кнопка + полоса прогресса + время */
+.player {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 18px);
+  text-align: left;
+}
+
+.player__btn {
+  flex: 0 0 auto;
+  width: clamp(40px, 6vmin, 48px);
+  height: clamp(40px, 6vmin, 48px);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.player__btn:hover,
+.player__btn:focus-visible { background: var(--ink); color: var(--paper); }
+.player__btn:disabled { opacity: 0.4; cursor: default; }
+
+.player__icon { width: 42%; height: 42%; fill: currentColor; }
+.player__icon--stop { display: none; }
+.player__btn.is-playing .player__icon--play { display: none; }
+.player__btn.is-playing .player__icon--stop { display: block; }
+
+.player__body { flex: 1 1 auto; min-width: 0; }
+
+.player__bar {
+  height: 3px;
+  background: rgba(11, 11, 11, 0.16);
+  overflow: hidden;
+}
+
+.player__fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--ink);
+}
+
+.player__time {
+  margin: 8px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+/* сам виджет SoundCloud уводим за экран — он только источник звука */
+.player__source {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+}
+
+.music__credit {
+  margin: clamp(8px, 1.4vh, 12px) 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music__credit a {
+  color: var(--ink);
+  text-decoration: none;
+  opacity: 0.6;
+}
+
+.music__credit a:hover { opacity: 1; text-decoration: underline; }
+
+/* ---------- 3. Череп ---------- */
 
 .stage {
   position: relative;
@@ -83,12 +184,12 @@ body {
 
 /* растровый череп: PNG с прозрачным фоном */
 .skull {
-  width: 78%;
+  width: 70%;
   height: auto;
   display: block;
 }
 
-/* ---------- 2. Сноска внизу ---------- */
+/* ---------- 4. Сноска внизу ---------- */
 
 .note {
   position: relative;
@@ -126,7 +227,7 @@ body {
   user-select: none;
 }
 
-/* ---------- 3. Вращающиеся кресты ---------- */
+/* ---------- 5. Вращающиеся кресты ---------- */
 
 .ring {
   position: absolute;
@@ -141,7 +242,7 @@ body {
   width: var(--cw);
   height: var(--ch);
   margin: calc(var(--ch) / -2) 0 0 calc(var(--cw) / -2);
-  transform: rotate(var(--a)) translateY(calc(var(--stage) * -0.57));
+  transform: rotate(var(--a)) translateY(calc(var(--stage) * -0.5));
 }
 
 /* гасим наклон слота, чтобы крест оставался вертикальным */
