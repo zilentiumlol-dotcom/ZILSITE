@@ -46,7 +46,9 @@ body {
 .leaves {
   position: fixed;
   top: 0;
-  height: 100%;
+  /* 100vh, а не 100%: на мобильных высота окна меняется при скрытии адресной
+     строки, и панели с листьями пересчитывали масштаб — выглядело как качание */
+  height: 100vh;
   width: clamp(96px, 14vw, 190px);
   z-index: 0;
   pointer-events: none;
@@ -81,6 +83,7 @@ body {
   background: var(--paper);
   border: 3px solid var(--ink);
   text-align: center;
+  overflow: hidden;
 }
 
 .music__caption {
@@ -143,14 +146,15 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* сам виджет SoundCloud уводим за экран — он только источник звука */
+/* сам виджет SoundCloud: невидим и обрезан рамкой плашки,
+   чтобы страница не получала лишней области прокрутки */
 .player__source {
   position: absolute;
-  left: -9999px;
-  top: 0;
-  width: 200px;
-  height: 200px;
-  overflow: hidden;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .music__credit {
