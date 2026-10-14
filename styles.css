@@ -21,16 +21,19 @@
 
 * { box-sizing: border-box; }
 
-html, body { height: 100%; }
+html { height: 100%; }
 
 body {
   margin: 0;
+  min-height: 100%;
   background: var(--paper);
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(16px, 3vh, 32px) 16px;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -71,6 +74,7 @@ body {
 .stage {
   position: relative;
   z-index: 1;
+  margin: auto 0;
   width: var(--stage);
   height: var(--stage);
   display: grid;
@@ -82,6 +86,44 @@ body {
   width: 78%;
   height: auto;
   display: block;
+}
+
+/* ---------- 2. Сноска внизу ---------- */
+
+.note {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 88vw);
+  padding: clamp(34px, 5vh, 46px) clamp(22px, 4vw, 44px) clamp(20px, 3vh, 30px);
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  text-align: center;
+}
+
+.note__title {
+  margin: 0 0 clamp(8px, 1.6vh, 14px);
+  font-size: clamp(17px, 2.6vmin, 24px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+}
+
+.note__text {
+  margin: 0;
+  font-size: clamp(13px, 1.8vmin, 16px);
+  line-height: 1.55;
+}
+
+/* бабочка сидит на верхнем крае сноски */
+.note__butterfly {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: clamp(76px, 11vmin, 124px);
+  height: auto;
+  transform: translate(-50%, -72%) rotate(-7deg);
+  pointer-events: none;
+  user-select: none;
 }
 
 /* ---------- 3. Вращающиеся кресты ---------- */
@@ -122,8 +164,10 @@ body {
 /* ---------- Адаптив и доступность ---------- */
 
 @media (max-width: 760px) {
-  :root { --stage: clamp(230px, 80vmin, 360px); }
-  .leaves { width: clamp(64px, 17vw, 120px); }
+  :root { --stage: clamp(230px, 78vmin, 350px); }
+  .leaves { width: clamp(52px, 13vw, 96px); }
+  /* на узком экране кресты жмём ближе, чтобы не задевали листья */
+  .slot { transform: rotate(var(--a)) translateY(calc(var(--stage) * -0.5)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
